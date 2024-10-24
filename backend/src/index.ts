@@ -12,9 +12,36 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.get("/players", async (req: Request, res: Response) => {
-  const players = await prisma.player.findMany();
+  try {
+    const players = await prisma.player.findMany({
+      select: {
+        id: true,
+        name: true,
+        age: true,
+        marketValue: true,
+        nationality: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        Club: {
+          select: {
+            id: true,
+            name: true,
+          },
+        },
+        position: true,
+      },
+      orderBy: {
+        id: "asc",
+      },
+    });
 
-  res.send(players);
+    res.status(200).send(players);
+  } catch (error) {
+    res.status(500).send({ error: "Something went wrong!" });
+  }
 });
 
 app.listen(port, () => {

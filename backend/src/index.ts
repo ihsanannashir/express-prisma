@@ -7,6 +7,8 @@ const port = process.env.REST_PORT;
 
 const prisma = new PrismaClient();
 
+app.use(express.json());
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
@@ -42,6 +44,41 @@ app.get("/players", async (req: Request, res: Response) => {
   } catch (error) {
     res.status(500).send({ error: "Something went wrong!" });
   }
+});
+
+app.post("/players", async (req: Request, res: Response) => {
+  const { name, age, clubId, nationalityId, marketValue, position } = req.body;
+
+  // Validate the incoming data (basic validation)
+  if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  try {
+    const player = await prisma.player.create({
+      data: {
+        name,
+        age,
+        nationalityId,
+        clubId,
+        marketValue,
+        position,
+      },
+    });
+
+    res
+      .status(201)
+      .json({ data: player, message: "Player created successfully" });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to create player" });
+  }
+});
+
+app.get("/countries", async (req: Request, res: Response) => {
+  const countries = await prisma.country.findMany();
+
+  res.status(200).send(countries);
 });
 
 app.listen(port, () => {

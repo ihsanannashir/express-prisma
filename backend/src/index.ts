@@ -68,10 +68,55 @@ app.post("/players", async (req: Request, res: Response) => {
 
     res
       .status(201)
-      .json({ data: player, message: "Player created successfully" });
+      .json({ data: player, message: "Player added successfully" });
   } catch (error) {
     console.error(error);
-    res.status(500).json({ error: "Failed to create player" });
+    res.status(500).json({ error: "Failed to add player" });
+  }
+});
+
+app.delete("/players/:id", async (req: Request, res: Response) => {
+  const playerId = Number(req.params.id);
+
+  try {
+    await prisma.player.delete({
+      where: {
+        id: playerId,
+      },
+    });
+
+    res.status(200).json({ message: "Played removed" });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.put("/players/:id", async (req: Request, res: Response) => {
+  const playerId = Number(req.params.id);
+  const { name, age, clubId, nationalityId, marketValue, position } = req.body;
+
+  try {
+    const player = await prisma.player.update({
+      where: {
+        id: playerId,
+      },
+      data: {
+        name,
+        age,
+        clubId,
+        nationalityId,
+        marketValue,
+        position,
+      },
+    });
+
+    res.status(200).json({
+      data: player,
+      message: "Data updated successfully",
+    });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ error: "Failed to update player" });
   }
 });
 
@@ -79,6 +124,70 @@ app.get("/countries", async (req: Request, res: Response) => {
   const countries = await prisma.country.findMany();
 
   res.status(200).send(countries);
+});
+
+app.post("/countries", async (req: Request, res: Response) => {
+  const { name } = req.body;
+
+  try {
+    const country = await prisma.country.create({
+      data: {
+        name,
+      },
+    });
+
+    if (!name) {
+      return res.status(400).json({ error: "All fields are required" });
+    }
+
+    res.status(201).json({
+      data: country,
+      message: "country added successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to add country" });
+  }
+});
+
+app.delete("/countries/:id", async (req: Request, res: Response) => {
+  const countryId = Number(req.params.id);
+
+  try {
+    await prisma.country.delete({
+      where: {
+        id: countryId,
+      },
+    });
+
+    res.status(200).json({ message: "Country Removed" });
+  } catch (error) {
+    console.log(error);
+  }
+});
+
+app.put("/countries/:id", async (req: Request, res: Response) => {
+  const countryId = Number(req.params.id);
+  const { name } = req.body;
+
+  try {
+    const country = await prisma.country.update({
+      where: {
+        id: countryId,
+      },
+      data: {
+        name,
+      },
+    });
+
+    res.status(200).json({
+      data: country,
+      message: "Data updated successfully",
+    });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ error: "Failed to update country" });
+  }
 });
 
 app.listen(port, () => {

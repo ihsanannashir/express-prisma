@@ -40,7 +40,7 @@ app.get("/players", async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).send(players);
+    res.status(200).json({ status: 200, message: "", data: players });
   } catch (error) {
     res.status(500).send({ error: "Something went wrong!" });
   }
@@ -49,7 +49,6 @@ app.get("/players", async (req: Request, res: Response) => {
 app.post("/players", async (req: Request, res: Response) => {
   const { name, age, clubId, nationalityId, marketValue, position } = req.body;
 
-  // Validate the incoming data (basic validation)
   if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
     return res.status(400).json({ error: "All fields are required" });
   }
@@ -69,7 +68,7 @@ app.post("/players", async (req: Request, res: Response) => {
     res
       .status(201)
       .json({ data: player, message: "Player added successfully" });
-  } catch (error) {
+  } catch (error: any) {
     console.error(error);
     res.status(500).json({ error: "Failed to add player" });
   }
@@ -85,9 +84,10 @@ app.delete("/players/:id", async (req: Request, res: Response) => {
       },
     });
 
-    res.status(200).json({ message: "Played removed" });
+    res.status(200).json({ message: "Player removed" });
   } catch (error) {
     console.log(error);
+    res.status(500).json({ error: "Failed to remove player" });
   }
 });
 
@@ -123,11 +123,15 @@ app.put("/players/:id", async (req: Request, res: Response) => {
 app.get("/countries", async (req: Request, res: Response) => {
   const countries = await prisma.country.findMany();
 
-  res.status(200).send(countries);
+  res.status(200).json({ status: 200, message: "", data: countries });
 });
 
 app.post("/countries", async (req: Request, res: Response) => {
   const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
   try {
     const country = await prisma.country.create({
@@ -135,10 +139,6 @@ app.post("/countries", async (req: Request, res: Response) => {
         name,
       },
     });
-
-    if (!name) {
-      return res.status(400).json({ error: "All fields are required" });
-    }
 
     res.status(201).json({
       data: country,
@@ -163,6 +163,7 @@ app.delete("/countries/:id", async (req: Request, res: Response) => {
     res.status(200).json({ message: "Country Removed" });
   } catch (error) {
     console.log(error);
+    res.status(500).send({ error: "Something went wrong!", message: error });
   }
 });
 

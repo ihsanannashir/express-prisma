@@ -95,6 +95,10 @@ app.put("/players/:id", async (req: Request, res: Response) => {
   const playerId = Number(req.params.id);
   const { name, age, clubId, nationalityId, marketValue, position } = req.body;
 
+  if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
   try {
     const player = await prisma.player.update({
       where: {
@@ -170,6 +174,10 @@ app.delete("/countries/:id", async (req: Request, res: Response) => {
 app.put("/countries/:id", async (req: Request, res: Response) => {
   const countryId = Number(req.params.id);
   const { name } = req.body;
+
+  if (!name) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
 
   try {
     const country = await prisma.country.update({

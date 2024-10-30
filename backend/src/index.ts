@@ -9,6 +9,16 @@ const prisma = new PrismaClient();
 
 app.use(express.json());
 
+const validatePlayerFields = (req: Request, res: Response, next: Function) => {
+  const { name, age, clubId, nationalityId, marketValue, position } = req.body;
+
+  if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
+    return res.status(400).json({ error: "All fields are required" });
+  }
+
+  next();
+};
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
@@ -46,33 +56,34 @@ app.get("/players", async (req: Request, res: Response) => {
   }
 });
 
-app.post("/players", async (req: Request, res: Response) => {
-  const { name, age, clubId, nationalityId, marketValue, position } = req.body;
+app.post(
+  "/players",
+  validatePlayerFields,
+  async (req: Request, res: Response) => {
+    const { name, age, clubId, nationalityId, marketValue, position } =
+      req.body;
 
-  if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
-    return res.status(400).json({ error: "All fields are required" });
+    try {
+      const player = await prisma.player.create({
+        data: {
+          name,
+          age,
+          nationalityId,
+          clubId,
+          marketValue,
+          position,
+        },
+      });
+
+      res
+        .status(201)
+        .json({ message: "Player added successfully", data: player });
+    } catch (error: any) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to add player" });
+    }
   }
-
-  try {
-    const player = await prisma.player.create({
-      data: {
-        name,
-        age,
-        nationalityId,
-        clubId,
-        marketValue,
-        position,
-      },
-    });
-
-    res
-      .status(201)
-      .json({ data: player, message: "Player added successfully" });
-  } catch (error: any) {
-    console.error(error);
-    res.status(500).json({ error: "Failed to add player" });
-  }
-});
+);
 
 app.delete("/players/:id", async (req: Request, res: Response) => {
   const playerId = Number(req.params.id);
@@ -91,32 +102,56 @@ app.delete("/players/:id", async (req: Request, res: Response) => {
   }
 });
 
-app.put("/players/:id", async (req: Request, res: Response) => {
-  const playerId = Number(req.params.id);
-  const { name, age, clubId, nationalityId, marketValue, position } = req.body;
+app.put(
+  "/players/:id",
+  validatePlayerFields,
+  async (req: Request, res: Response) => {
+    const playerId = Number(req.params.id);
+    const { name, age, clubId, nationalityId, marketValue, position } =
+      req.body;
 
-  if (!name || !age || !clubId || !nationalityId || !marketValue || !position) {
-    return res.status(400).json({ error: "All fields are required" });
+    try {
+      const player = await prisma.player.update({
+        where: {
+          id: playerId,
+        },
+        data: {
+          name,
+          age,
+          clubId,
+          nationalityId,
+          marketValue,
+          position,
+        },
+      });
+
+      res.status(200).json({
+        data: player,
+        message: "Data updated successfully",
+      });
+    } catch (error) {
+      console.error(error);
+      res.status(500).json({ error: "Failed to update player" });
+    }
   }
+);
+
+app.patch("/players/:id", async (req: Request, res: Response) => {
+  const playerId = Number(req.params.id);
+  const data = req.body;
 
   try {
     const player = await prisma.player.update({
       where: {
         id: playerId,
       },
-      data: {
-        name,
-        age,
-        clubId,
-        nationalityId,
-        marketValue,
-        position,
-      },
+      data,
     });
 
     res.status(200).json({
-      data: player,
+      status: 200,
       message: "Data updated successfully",
+      data: player,
     });
   } catch (error) {
     console.error(error);

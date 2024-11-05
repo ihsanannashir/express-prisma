@@ -1,5 +1,4 @@
 import { Request, Response, Router } from "express";
-import prisma from "../shared/database";
 import {
   createPlayer,
   deletePlayerById,

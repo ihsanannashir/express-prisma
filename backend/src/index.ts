@@ -19,6 +19,18 @@ const validatePlayerFields = (req: Request, res: Response, next: Function) => {
   next();
 };
 
+// Error-handling middleware
+app.use((err: any, req: Request, res: Response, next: Function) => {
+  // Log the error stack for debugging
+  console.error("Error stack:", err.stack);
+
+  // Send a consistent error response
+  res.status(500).json({
+    error: "An internal server error occurred. Please try again later.",
+    details: err.message || "Unknown error",
+  });
+});
+
 app.get("/", (req: Request, res: Response) => {
   res.send("Express + TypeScript Server");
 });
@@ -53,6 +65,28 @@ app.get("/players", async (req: Request, res: Response) => {
     res.status(200).json({ status: 200, message: "", data: players });
   } catch (error) {
     res.status(500).send({ error: "Something went wrong!" });
+  }
+});
+
+app.get("/players/:id", async (req: Request, res: Response, next: Function) => {
+  try {
+    const id = Number(req.params.id);
+
+    const player = await prisma.player.findUnique({
+      where: {
+        id: id,
+      },
+    });
+
+    if (!player) {
+      return res
+        .status(404)
+        .json({ status: 404, message: "Player not found", data: player });
+    }
+
+    res.status(200).json({ status: 200, message: "", data: player });
+  } catch (error) {
+    next(error);
   }
 });
 

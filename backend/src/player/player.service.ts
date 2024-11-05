@@ -1,41 +1,21 @@
 import prisma from "../shared/database";
 import { PlayerData } from "../shared/types/player";
+import {
+  deletePlayer,
+  editPlayer,
+  findPlayerById,
+  findPlayers,
+  insertPlayer,
+} from "./player.repository";
 
 const getAllPlayers = async () => {
-  const players = await prisma.player.findMany({
-    select: {
-      id: true,
-      name: true,
-      age: true,
-      marketValue: true,
-      nationality: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      Club: {
-        select: {
-          id: true,
-          name: true,
-        },
-      },
-      position: true,
-    },
-    orderBy: {
-      id: "asc",
-    },
-  });
+  const players = await findPlayers();
 
   return players;
 };
 
 const getPlayerById = async (id: number) => {
-  const player = await prisma.player.findUnique({
-    where: {
-      id: id,
-    },
-  });
+  const player = await findPlayerById(id);
 
   if (!player) {
     throw Error("Player not found");
@@ -45,39 +25,20 @@ const getPlayerById = async (id: number) => {
 };
 
 const createPlayer = async (playerData: PlayerData) => {
-  const player = await prisma.player.create({
-    data: {
-      name: playerData.name,
-      age: playerData.age,
-      nationalityId: playerData.nationalityId,
-      clubId: playerData.clubId,
-      marketValue: playerData.marketValue,
-      position: playerData.position,
-    },
-  });
+  const player = await insertPlayer(playerData);
 
   return player;
 };
 
 const deletePlayerById = async (id: number) => {
   await getPlayerById(id);
-
-  await prisma.player.delete({
-    where: {
-      id,
-    },
-  });
+  await deletePlayer(id);
 };
 
 const updatePlayerById = async (id: number, playerData: PlayerData) => {
   await getPlayerById(id);
 
-  const player = await prisma.player.update({
-    where: {
-      id,
-    },
-    data: playerData,
-  });
+  const player = await editPlayer(id, playerData);
 
   return player;
 };

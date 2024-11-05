@@ -8,13 +8,13 @@ import {
 
 const router = Router();
 
-router.get("/countries", async (req: Request, res: Response) => {
+router.get("/", async (req: Request, res: Response) => {
   const countries = await getAllCountries();
 
   res.status(200).json({ status: 200, message: "", data: countries });
 });
 
-router.post("/countries", async (req: Request, res: Response) => {
+router.post("/", async (req: Request, res: Response) => {
   try {
     const countryData = req.body;
 
@@ -34,7 +34,7 @@ router.post("/countries", async (req: Request, res: Response) => {
   }
 });
 
-router.delete("/countries/:id", async (req: Request, res: Response) => {
+router.delete("/:id", async (req: Request, res: Response) => {
   const countryId = Number(req.params.id);
 
   try {
@@ -47,7 +47,7 @@ router.delete("/countries/:id", async (req: Request, res: Response) => {
   }
 });
 
-router.put("/countries/:id", async (req: Request, res: Response) => {
+router.put("/:id", async (req: Request, res: Response) => {
   try {
     const countryId = Number(req.params.id);
     const countryData = req.body;

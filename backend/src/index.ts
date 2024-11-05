@@ -1,5 +1,6 @@
 import express, { Express, Request, Response } from "express";
 import playerController from "./player/player.controller";
+import countryController from "./country/country.controller";
 import "dotenv/config";
 
 const app: Express = express();
@@ -12,7 +13,7 @@ app.get("/", (req: Request, res: Response) => {
 });
 
 app.use("/players", playerController);
-app.use("/countries", playerController);
+app.use("/countries", countryController);
 
 app.listen(port, () => {
   console.log(`[server]: Server is running at http://localhost:${port}`);

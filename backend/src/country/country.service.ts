@@ -1,4 +1,3 @@
-import prisma from "../shared/database";
 import { ClubData } from "../shared/types/club";
 import {
   deleteCountry,

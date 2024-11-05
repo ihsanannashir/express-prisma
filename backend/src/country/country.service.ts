@@ -1,43 +1,29 @@
 import prisma from "../shared/database";
 import { ClubData } from "../shared/types/club";
+import {
+  deleteCountry,
+  editCountry,
+  findCountries,
+  insertCountry,
+} from "./country.repository";
 
 const getAllCountries = async () => {
-  const countries = await prisma.country.findMany();
+  const countries = await findCountries();
 
   return countries;
 };
 
 const createCountry = async (countryData: ClubData) => {
-  if (!countryData) {
-    throw Error("All fields are required");
-  }
-
-  const country = await prisma.country.create({
-    data: {
-      name: countryData.name,
-    },
-  });
-
+  const country = await insertCountry(countryData);
   return country;
 };
 
 const deleteCountryById = async (countryId: number) => {
-  await prisma.country.delete({
-    where: {
-      id: countryId,
-    },
-  });
+  await deleteCountry(countryId);
 };
 
 const updateCountryById = async (countryId: number, countryData: ClubData) => {
-  const country = await prisma.country.update({
-    where: {
-      id: countryId,
-    },
-    data: {
-      name: countryData.name,
-    },
-  });
+  const country = await editCountry(countryId, countryData);
 
   return country;
 };

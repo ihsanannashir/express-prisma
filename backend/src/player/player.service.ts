@@ -31,10 +31,6 @@ const getAllPlayers = async () => {
 };
 
 const getPlayerById = async (id: number) => {
-  if (typeof id !== "number") {
-    throw Error("ID is not a number");
-  }
-
   const player = await prisma.player.findUnique({
     where: {
       id: id,

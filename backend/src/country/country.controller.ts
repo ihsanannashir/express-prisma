@@ -15,9 +15,13 @@ router.get("/countries", async (req: Request, res: Response) => {
 });
 
 router.post("/countries", async (req: Request, res: Response) => {
-  const countryData = req.body;
-
   try {
+    const countryData = req.body;
+
+    if (!countryData) {
+      throw Error("All fields are required");
+    }
+
     const country = await createCountry(countryData);
 
     res.status(201).json({

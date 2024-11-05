@@ -30,10 +30,6 @@ const deleteCountryById = async (countryId: number) => {
 };
 
 const updateCountryById = async (countryId: number, countryData: ClubData) => {
-  if (!countryData) {
-    throw Error("All fields are required");
-  }
-
   const country = await prisma.country.update({
     where: {
       id: countryId,

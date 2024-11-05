@@ -48,6 +48,10 @@ router.put("/countries/:id", async (req: Request, res: Response) => {
     const countryId = Number(req.params.id);
     const countryData = req.body;
 
+    if (!countryData) {
+      res.status(400).json({ error: "All fields are required" });
+    }
+
     const country = await updateCountryById(countryId, countryData);
 
     res.status(200).json({
